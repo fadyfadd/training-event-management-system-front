@@ -1,37 +1,38 @@
-import React from 'react';
+
+import React from 'react'
+import { AppBar, Button, IconButton, Stack, Toolbar, Typography } from '@mui/material'
+import FoundationIcon from '@mui/icons-material/Foundation';
 import { NavLink } from 'react-router-dom';
 
-const Navbar = () => {
-  return (
-    <nav style={{
-      display: 'flex',
-      gap: '1rem',
-      padding: '1rem',
-      background: '#f0f0f0',
-      marginBottom: '2rem'
-    }}>
-      <NavLink
-        to="/"
-        style={({ isActive }) => ({
-          color: isActive ? 'blue' : 'black',
-          textDecoration: 'none',
-          fontWeight: isActive ? 'bold' : 'normal'
-        })}
-      >
-        Home
-      </NavLink>
-      <NavLink
-        to="/login"
-        style={({ isActive }) => ({
-          color: isActive ? 'blue' : 'black',
-          textDecoration: 'none',
-          fontWeight: isActive ? 'bold' : 'normal'
-        })}
-      >
-        Login
-      </NavLink>
-    </nav>
-  );
-};
 
+  const Navbar = () => {
+
+    const linkStyle = ({ isActive }) => ({
+      textDecoration: 'none',
+      color: 'inherit',
+      borderBottom: isActive ? '2px solid white' : 'none'
+    });
+    
+  return (
+    <AppBar position='static'>
+      <Toolbar>
+        <IconButton size='large' edge='start' color='inherit' aria-label='logo'>
+          <FoundationIcon />
+        </IconButton>
+        <Typography variant='h6' component='div' sx={{flexGrow : 1}}>
+          Training System
+        </Typography>
+        <Stack direction={'row'} spacing={2}>
+          <NavLink to={"/"} style={linkStyle}>
+            <Button color='inherit'>Home</Button>
+          </NavLink>
+          <NavLink to={"/login"} style={linkStyle}>
+          <Button color='inherit'>Login</Button>
+          </NavLink>
+        </Stack>
+      </Toolbar>
+      
+    </AppBar>
+  )
+}
 export default Navbar;

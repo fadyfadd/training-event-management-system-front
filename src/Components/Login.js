@@ -7,13 +7,13 @@ import {
   Typography,
   Box,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Button,
   Alert,
   MenuItem, Select, InputLabel, FormControl
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+
+import {useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   const [userName, setUserName] = useState('');
@@ -21,6 +21,8 @@ const LoginPage = () => {
   const [role, setRole] = useState('');
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -40,15 +42,21 @@ const LoginPage = () => {
 
       const token = await res.text();
       localStorage.setItem('token', token);
-      // localStorage.setItem('role', role);
+      localStorage.setItem('role', role);
       setMessage('Login successful!');
       setError('');
-      console.log('Token stored:', token);
+      // console.log('Token stored:', token);
     } catch (err) {
       setError(err.message);
       setMessage('');
     }
+
+    if (role === 'ADMIN') {
+      navigate("/admin/home")
+    }
   };
+  
+  
 
   return (
   <>
@@ -108,10 +116,6 @@ const LoginPage = () => {
              </Select>
            </FormControl>
 
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
           <Button type="submit" variant="contained" fullWidth sx={{ mt: 1 }}>
             Log In
           </Button>
