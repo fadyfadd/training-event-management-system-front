@@ -7,6 +7,8 @@ import { NavLink } from 'react-router-dom';
 
   const Navbar = () => {
 
+    // const role = localStorage.getItem('role');
+
     const linkStyle = ({ isActive }) => ({
       textDecoration: 'none',
       color: 'inherit',

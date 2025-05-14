@@ -4,7 +4,7 @@ import FoundationIcon from '@mui/icons-material/Foundation';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 
-export const AdminNav = () => {
+export const TeacherNav = () => {
     const linkStyle = ({ isActive }) => ({
         textDecoration: 'none',
         color: 'inherit',
@@ -30,16 +30,16 @@ export const AdminNav = () => {
         </Typography>
         <Stack direction={'row'} spacing={2}>
 
-          <NavLink to="/admin/home" style={linkStyle}>
+          <NavLink to="/teacher/home" style={linkStyle}>
             <Button color='inherit'>Home</Button>
           </NavLink>
 
-          <NavLink to="/admin/getAllStudents" style={linkStyle} >
+          <NavLink to="/teacher/getAllStudents" style={linkStyle} >
             <Button color='inherit'>All Students</Button>
           </NavLink>
 
-          <NavLink to= "/admin/getAllTeachers" style={linkStyle} >
-            <Button color='inherit'>All Teachers</Button>
+          <NavLink to="/teacher/myEvents" style={linkStyle} >
+            <Button color='inherit'>My Events</Button>
           </NavLink>
 
           <Button color='inherit' onClick={handleLogout}>Log Out</Button>
@@ -50,4 +50,4 @@ export const AdminNav = () => {
     </AppBar>
   )
 }
-export default AdminNav;
+export default TeacherNav;

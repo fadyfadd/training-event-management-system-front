@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, } from '@mui/material';
-import AdminNav from './AdminNav';
+import AdminNav from './NavBar/AdminNav';
+import TeacherNav from './NavBar/TeacherNav';
 
 
 const AllStudents = () => {
   const [students, setStudents] = useState([]);
+  const role = localStorage.getItem('role');
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -30,35 +32,35 @@ const AllStudents = () => {
 
   return (
     <>
-    <AdminNav/>
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        All Students
-      </Typography>
+      {role === 'ADMIN' ? <AdminNav /> : role === 'TEACHER' ? <TeacherNav /> : null}
+      <Box sx={{ p: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          All Students
+        </Typography>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell><strong>ID</strong></TableCell>
-              <TableCell><strong>First Name</strong></TableCell>
-              <TableCell><strong>Last Name</strong></TableCell>
-              <TableCell><strong>Email</strong></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {students.map((student) => (
-              <TableRow key={student.id}>
-                <TableCell>{student.id}</TableCell>
-                <TableCell>{student.firstName}</TableCell>
-                <TableCell>{student.lastName}</TableCell>
-                <TableCell>{student.email}</TableCell>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>ID</strong></TableCell>
+                <TableCell><strong>First Name</strong></TableCell>
+                <TableCell><strong>Last Name</strong></TableCell>
+                <TableCell><strong>Email</strong></TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Box>
+            </TableHead>
+            <TableBody>
+              {students.map((student) => (
+                <TableRow key={student.id}>
+                  <TableCell>{student.id}</TableCell>
+                  <TableCell>{student.firstName}</TableCell>
+                  <TableCell>{student.lastName}</TableCell>
+                  <TableCell>{student.email}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </>
   );
 };

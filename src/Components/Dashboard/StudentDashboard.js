@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Typography, Container, Paper } from '@mui/material';
-import AdminNav from './AdminNav';
+import StudentNav from '../NavBar/StudentNav';
 
-const AdminDashboard = () => {
+const StudentDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -15,11 +15,11 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <AdminNav />
+      <StudentNav />
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="h4" gutterBottom>
-            Welcome, Admin!
+            Welcome, {localStorage.getItem('role')}!
           </Typography>
           <Typography variant="body1">
             This is your dashboard.
@@ -30,4 +30,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default StudentDashboard;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Navbar from './Navbar';
+import Navbar from './NavBar/Navbar';
 import {
   Container,
   Paper,
@@ -45,15 +45,22 @@ const LoginPage = () => {
       localStorage.setItem('role', role);
       setMessage('Login successful!');
       setError('');
+
+      if (role === 'ADMIN') {
+        navigate("/admin/home")
+      }else if(role === 'TEACHER'){
+        navigate("/teacher/home")
+      }else if(role === 'STUDENT'){
+        navigate('/student/home')
+      }
+
       // console.log('Token stored:', token);
     } catch (err) {
       setError(err.message);
       setMessage('');
     }
 
-    if (role === 'ADMIN') {
-      navigate("/admin/home")
-    }
+    
   };
   
   
