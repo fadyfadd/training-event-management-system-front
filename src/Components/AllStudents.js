@@ -1,34 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, } from '@mui/material';
+import {
+  Table, TableBody, TableCell, TableContainer, TableHead,
+  TableRow, Paper, Typography, Box, TablePagination,
+} from '@mui/material';
 import AdminNav from './NavBar/AdminNav';
 import TeacherNav from './NavBar/TeacherNav';
 
-
 const AllStudents = () => {
   const [students, setStudents] = useState([]);
+  const [totalElements, setTotalElements] = useState(0);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const role = localStorage.getItem('role');
 
+  const fetchStudents = async (page, size) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`http://localhost:8080/students/paginated?page=${page}&size=${size}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setStudents(res.data.content);
+      setTotalElements(res.data.totalElements);
+    } catch (error) {
+      console.error('Failed to fetch students:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        // console.log(token);
-        const res = await axios.get('http://localhost:8080/students/all', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setStudents(res.data);
-        console.log('Response:', res.data);
+    fetchStudents(page, rowsPerPage);
+  }, [page, rowsPerPage]);
 
-      } catch (error) {
-        console.error('Failed to fetch students:', error);
-      }
-    };
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-    fetchStudents();
-  }, []);
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset page when changing rows per page
+  };
 
   return (
     <>
@@ -43,6 +55,7 @@ const AllStudents = () => {
             <TableHead>
               <TableRow>
                 <TableCell><strong>ID</strong></TableCell>
+                <TableCell><strong>Username</strong></TableCell>
                 <TableCell><strong>First Name</strong></TableCell>
                 <TableCell><strong>Last Name</strong></TableCell>
                 <TableCell><strong>Email</strong></TableCell>
@@ -52,6 +65,7 @@ const AllStudents = () => {
               {students.map((student) => (
                 <TableRow key={student.id}>
                   <TableCell>{student.id}</TableCell>
+                  <TableCell>{student.username}</TableCell>
                   <TableCell>{student.firstName}</TableCell>
                   <TableCell>{student.lastName}</TableCell>
                   <TableCell>{student.email}</TableCell>
@@ -59,6 +73,16 @@ const AllStudents = () => {
               ))}
             </TableBody>
           </Table>
+
+          <TablePagination
+            component="div"
+            count={totalElements}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[3, 5, 10, 50]}
+          />
         </TableContainer>
       </Box>
     </>

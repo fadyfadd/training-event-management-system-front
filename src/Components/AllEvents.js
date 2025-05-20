@@ -1,28 +1,45 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Box, } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import {
+    Table, TableBody, TableCell, TableContainer, TableHead,
+    TableRow, Paper, Typography, Box, TablePagination,
+} from '@mui/material';
 import AdminNav from './NavBar/AdminNav';
-
 
 export const AllEvents = () => {
     const [events, setEvents] = useState([]);
+    const [totalElements, setTotalElements] = useState(0);
+    const [page, setPage] = useState(0); 
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+
+    const fetchEvents = async (page, size) => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`http://localhost:8080/events/paginated?page=${page}&size=${size}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setEvents(res.data.content);
+            setTotalElements(res.data.totalElements);
+        } catch (error) {
+            console.error("Error fetching events: ", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:8080/events/all', {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                setEvents(res.data);
-            } catch (error) {
-                console.error("error fetching events: ", error);
-            }
-        };
-        fetchEvents();
-    }, [])
+        fetchEvents(page, rowsPerPage);
+    }, [page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+
     return (
         <>
             <AdminNav />
@@ -59,10 +76,19 @@ export const AllEvents = () => {
                                 </TableRow>
                             ))}
                         </TableBody>
-
                     </Table>
+
+                    <TablePagination
+                        component="div"
+                        count={totalElements}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        rowsPerPageOptions={[3, 6, 9, 50]}
+                    />
                 </TableContainer>
             </Box>
         </>
-    )
-}
+    );
+};
