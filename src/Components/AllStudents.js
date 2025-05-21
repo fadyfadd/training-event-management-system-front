@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Paper, Typography, Box, TablePagination,
+  TableRow, Paper, Typography, Box, TablePagination, TextField, Button, Stack,
 } from '@mui/material';
 import AdminNav from './NavBar/AdminNav';
 import TeacherNav from './NavBar/TeacherNav';
@@ -12,6 +12,7 @@ const AllStudents = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [searchId, setSearchId] = useState('');
   const role = localStorage.getItem('role');
 
   const fetchStudents = async (page, size) => {
@@ -29,9 +30,31 @@ const AllStudents = () => {
     }
   };
 
+  const fetchStudentById = async () => {
+    if (!searchId) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`http://localhost:8080/students/${searchId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setStudents([res.data]); // Wrap single student in array for table rendering
+      setTotalElements(1);
+      setPage(0);
+    } catch (error) {
+      console.error("Student not found: ", error);
+      setStudents([]);
+      setTotalElements(0);
+    }
+  };
+
   useEffect(() => {
-    fetchStudents(page, rowsPerPage);
-  }, [page, rowsPerPage]);
+    if (!searchId) {
+      fetchStudents(page, rowsPerPage);
+    }
+  }, [page, rowsPerPage, searchId]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -39,7 +62,18 @@ const AllStudents = () => {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset page when changing rows per page
+    setPage(0);
+  };
+
+  const handleSearch = () => {
+    setPage(0);
+    fetchStudentById();
+  };
+
+  const handleReset = () => {
+    setSearchId('');
+    setPage(0);
+    fetchStudents(0, rowsPerPage);
   };
 
   return (
@@ -49,6 +83,30 @@ const AllStudents = () => {
         <Typography variant="h4" gutterBottom>
           All Students
         </Typography>
+
+        <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+          <TextField
+            label="Search by Student ID"
+            variant="outlined"
+            type="number"
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
+            size="small"
+          />
+          <Button 
+            variant="contained" 
+            onClick={handleSearch} 
+            disabled={!searchId}
+          >
+            Search
+          </Button>
+          <Button 
+            variant="outlined" 
+            onClick={handleReset}
+          >
+            Reset
+          </Button>
+        </Stack>
 
         <TableContainer component={Paper}>
           <Table>
@@ -62,27 +120,37 @@ const AllStudents = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {students.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell>{student.id}</TableCell>
-                  <TableCell>{student.username}</TableCell>
-                  <TableCell>{student.firstName}</TableCell>
-                  <TableCell>{student.lastName}</TableCell>
-                  <TableCell>{student.email}</TableCell>
+              {students.length > 0 ? (
+                students.map((student) => (
+                  <TableRow key={student.id}>
+                    <TableCell>{student.id}</TableCell>
+                    <TableCell>{student.username}</TableCell>
+                    <TableCell>{student.firstName}</TableCell>
+                    <TableCell>{student.lastName}</TableCell>
+                    <TableCell>{student.email}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    No students found
+                  </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
 
-          <TablePagination
-            component="div"
-            count={totalElements}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[3, 5, 10, 50]}
-          />
+          {!searchId && (
+            <TablePagination
+              component="div"
+              count={totalElements}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+          )}
         </TableContainer>
       </Box>
     </>
