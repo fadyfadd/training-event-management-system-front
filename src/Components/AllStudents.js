@@ -12,17 +12,23 @@ const AllStudents = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [searchId, setSearchId] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
   const role = localStorage.getItem('role');
 
-  const fetchStudents = async (page, size) => {
+  const fetchStudents = async (page, size, username = '') => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:8080/students/paginated?page=${page}&size=${size}`, {
+      const url = username
+        ? `http://localhost:8080/students/search?username=${username}&page=${page}&size=${size}`
+        : `http://localhost:8080/students/paginated?page=${page}&size=${size}`;
+
+      const res = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       setStudents(res.data.content);
       setTotalElements(res.data.totalElements);
     } catch (error) {
@@ -30,31 +36,20 @@ const AllStudents = () => {
     }
   };
 
-  const fetchStudentById = async () => {
-    if (!searchId) return;
+  useEffect(() => {
+    fetchStudents(page, rowsPerPage, searchTerm);
+  }, [page, rowsPerPage, searchTerm]);
 
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:8080/students/${searchId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setStudents([res.data]); // Wrap single student in array for table rendering
-      setTotalElements(1);
-      setPage(0);
-    } catch (error) {
-      console.error("Student not found: ", error);
-      setStudents([]);
-      setTotalElements(0);
-    }
+  const handleSearch = () => {
+    setPage(0);
+    setSearchTerm(searchQuery.trim());
   };
 
-  useEffect(() => {
-    if (!searchId) {
-      fetchStudents(page, rowsPerPage);
-    }
-  }, [page, rowsPerPage, searchId]);
+  const handleReset = () => {
+    setSearchQuery('');
+    setSearchTerm('');
+    setPage(0);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -63,17 +58,6 @@ const AllStudents = () => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const handleSearch = () => {
-    setPage(0);
-    fetchStudentById();
-  };
-
-  const handleReset = () => {
-    setSearchId('');
-    setPage(0);
-    fetchStudents(0, rowsPerPage);
   };
 
   return (
@@ -86,17 +70,16 @@ const AllStudents = () => {
 
         <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
           <TextField
-            label="Search by Student ID"
+            label="Search by Username"
             variant="outlined"
-            type="number"
-            value={searchId}
-            onChange={(e) => setSearchId(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             size="small"
           />
           <Button 
             variant="contained" 
-            onClick={handleSearch} 
-            disabled={!searchId}
+            onClick={handleSearch}
+            disabled={!searchQuery.trim()}
           >
             Search
           </Button>
@@ -140,17 +123,15 @@ const AllStudents = () => {
             </TableBody>
           </Table>
 
-          {!searchId && (
-            <TablePagination
-              component="div"
-              count={totalElements}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              rowsPerPageOptions={[5, 10, 25, 50]}
-            />
-          )}
+          <TablePagination
+            component="div"
+            count={totalElements}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25, 50]}
+          />
         </TableContainer>
       </Box>
     </>
