@@ -34,9 +34,13 @@ export const StudentNav = () => {
             <Button color='inherit'>Home</Button>
           </NavLink>
 
-          {/* <NavLink to="/teacher/getAllStudents" style={linkStyle} >
-            <Button color='inherit'>All Students</Button>
-          </NavLink> */}
+          <NavLink to="/student/registerToEvent" style={linkStyle} >
+            <Button color='inherit'>Register</Button>
+          </NavLink>
+
+          <NavLink to="/student/myEvents" style={linkStyle} >
+            <Button color='inherit'>Registered Events</Button>
+          </NavLink>
 
           <Button color='inherit' onClick={handleLogout}>Log Out</Button>
 

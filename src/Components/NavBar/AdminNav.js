@@ -50,6 +50,10 @@ export const AdminNav = () => {
             <Button color='inherit'>Register Student to Event</Button>
           </NavLink>
 
+          <NavLink to= "/admin/createEvent" style={linkStyle} >
+            <Button color='inherit'>Create Event</Button>
+          </NavLink>
+
           <Button color='inherit' onClick={handleLogout}>Log Out</Button>
 
         </Stack>

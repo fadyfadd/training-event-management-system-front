@@ -4,12 +4,15 @@ import Home from './Components/Home';
 import LoginPage from './Components/Login';
 import AdminDashboard from './Components/Dashboard/AdminDashboard';
 import AllStudents from './Components/AllStudents';
-import { AllTeachers } from './Components/AllTeachers';
+import AllTeachers from './Components/AllTeachers';
 import TeacherDashboard from './Components/Dashboard/TeacherDashboard'
 import { AllEvents } from './Components/AllEvents';
 import StudentDashboard from './Components/Dashboard/StudentDashboard';
 import TeacherEvents from './Components/TeacherEvents';
 import RegisterStudentToEvent from './Components/RegisterStudentToEvent';
+import CreateEvent from './Components/CreateEvent';
+import EventRegistration from './Components/EventRegistration';
+import StudentEvents from './Components/StudentEvents';
 
 const RootLayout = () => {
   return (
@@ -53,6 +56,10 @@ const router = createBrowserRouter([
         element: <RegisterStudentToEvent />
       },
       {
+        path: "/admin/createEvent",
+        element: <CreateEvent />
+      },
+      {
         path: "teacher/home",
         element: <TeacherDashboard />
       },
@@ -67,6 +74,14 @@ const router = createBrowserRouter([
       {
         path: "student/home",
         element: <StudentDashboard />
+      },
+      {
+        path: "student/registerToEvent",
+        element: <EventRegistration />
+      },
+      {
+        path: "student/myEvents",
+        element: <StudentEvents />
       }
     ],
   },
