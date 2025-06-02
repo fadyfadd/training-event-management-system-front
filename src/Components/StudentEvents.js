@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import StudentNav from './NavBar/StudentNav';
 import { jwtDecode } from 'jwt-decode';
+import axiosInstance from './axiosInstance';
 
 const StudentEvents = () => {
   const [events, setEvents] = useState([]);
@@ -33,11 +34,7 @@ const StudentEvents = () => {
   useEffect(() => {
     const fetchStudentEvents = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/events/student/${username}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axiosInstance.get(`/events/student/${username}`);
         setEvents(res.data);
         console.log('📦 Student events:', res.data);
       } catch (error) {
@@ -54,11 +51,7 @@ const StudentEvents = () => {
     if (!eventToUnregister) return;
 
     try {
-      await axios.delete(`http://localhost:8080/events/${eventToUnregister}/unregister/${username}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axiosInstance.delete(`/events/${eventToUnregister}/unregister/${username}`);
       setEvents(events.filter(event => event.id !== eventToUnregister));
       console.log(`✅ Unregistered from event ID: ${eventToUnregister}`);
     } catch (error) {

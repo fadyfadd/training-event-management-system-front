@@ -3,9 +3,11 @@ import React, { useEffect, useState } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, Typography, Box, TablePagination,
-  TextField, Button, Stack,
+  TextField, Button, Stack, Dialog, DialogTitle, DialogContent,
+  List, ListItem, ListItemText
 } from '@mui/material';
 import AdminNav from './NavBar/AdminNav';
+import axiosInstance from './axiosInstance';
 
 export const AllEvents = () => {
   const [events, setEvents] = useState([]);
@@ -13,15 +15,13 @@ export const AllEvents = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchId, setSearchId] = useState('');
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const fetchEvents = async (page, size) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:8080/events/paginated?page=${page}&size=${size}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // http://localhost:8080/events/paginated?page=${page}&size=${size}
+      const res = await axiosInstance.get(`/events/paginated?page=${page}&size=${size}`);
       setEvents(res.data.content);
       setTotalElements(res.data.totalElements);
     } catch (error) {
@@ -33,15 +33,10 @@ export const AllEvents = () => {
     if (!searchId) return;
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`http://localhost:8080/events/${searchId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setEvents([res.data]); // Wrap single event in array for table rendering
-      setTotalElements(1);
-      setPage(0);
+     const res = await axiosInstance.get(`/events/${searchId}`);
+     setEvents([res.data]);
+     setTotalElements(1);
+     setPage(0);
     } catch (error) {
       console.error("Event not found: ", error);
       setEvents([]);
@@ -75,6 +70,23 @@ export const AllEvents = () => {
     fetchEvents(0, rowsPerPage);
   };
 
+  const handleViewStudents = async (eventId) => {
+    try {
+     const res = await axiosInstance.get(`/events/${eventId}/students`);
+     setSelectedStudents(res.data);
+     setDialogOpen(true);
+    } catch (error) {
+      console.error("Error fetching students for event: ", error);
+      setSelectedStudents([]);
+      setDialogOpen(true);
+    }
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedStudents([]);
+  };
+
   return (
     <>
       <AdminNav />
@@ -83,7 +95,6 @@ export const AllEvents = () => {
           All Events
         </Typography>
 
-        {/* Search bar and buttons */}
         <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
           <TextField
             label="Search by Event ID"
@@ -113,6 +124,7 @@ export const AllEvents = () => {
                 <TableCell><strong>Max Students</strong></TableCell>
                 <TableCell><strong>Course Name</strong></TableCell>
                 <TableCell><strong>Teacher</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -127,11 +139,20 @@ export const AllEvents = () => {
                     <TableCell>{event.maxStudents}</TableCell>
                     <TableCell>{event.course?.title || 'N/A'}</TableCell>
                     <TableCell>{`${event.teacher?.firstName || ''} ${event.teacher?.lastName || ''}`}</TableCell>
+                    <TableCell>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={() => handleViewStudents(event.id || event.eventId)}
+                      >
+                        View Students
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} align="center">No events found.</TableCell>
+                  <TableCell colSpan={9} align="center">No events found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -150,6 +171,24 @@ export const AllEvents = () => {
           )}
         </TableContainer>
       </Box>
+
+      {/* Dialog for viewing students */}
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Registered Students</DialogTitle>
+        <DialogContent>
+          {selectedStudents.length > 0 ? (
+            <List>
+              {selectedStudents.map((student, idx) => (
+                <ListItem key={idx}>
+                  <ListItemText primary={student.username} />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography>No students registered for this event.</Typography>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

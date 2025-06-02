@@ -3,8 +3,10 @@ import axios from 'axios';
 import {
   Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Typography, Box,
+  Button, Dialog, DialogTitle, DialogContent, List, ListItem, ListItemText
 } from '@mui/material';
 import TeacherNav from './NavBar/TeacherNav';
+import axiosInstance from './axiosInstance';
 
 const getUsernameFromToken = (token) => {
   try {
@@ -18,20 +20,18 @@ const getUsernameFromToken = (token) => {
 
 const TeacherEvents = () => {
   const [events, setEvents] = useState([]);
-//   const role = localStorage.getItem('role');
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedEventTitle, setSelectedEventTitle] = useState('');
+
   const token = localStorage.getItem('token');
   const username = getUsernameFromToken(token);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/events/teacher/${username}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axiosInstance.get(`/events/teacher/${username}`)
         setEvents(res.data);
-        console.log('Events fetched:', res.data);
       } catch (error) {
         console.error('Failed to fetch events:', error);
       }
@@ -41,6 +41,22 @@ const TeacherEvents = () => {
       fetchEvents();
     }
   }, [username, token]);
+
+  const handleViewStudents = async (eventId, eventTitle) => {
+    try {
+      const res = await axiosInstance.get(`/events/${eventId}/students`);
+      setSelectedStudents(res.data); 
+      setSelectedEventTitle(eventTitle);
+      setOpen(true);
+    } catch (error) {
+      console.error('Failed to fetch students for event:', error);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedStudents([]);
+  };
 
   return (
     <>
@@ -60,6 +76,7 @@ const TeacherEvents = () => {
                 <TableCell><strong>Start Date</strong></TableCell>
                 <TableCell><strong>End Date</strong></TableCell>
                 <TableCell><strong>Max Students</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -67,15 +84,41 @@ const TeacherEvents = () => {
                 <TableRow key={index}>
                   <TableCell>{event.title}</TableCell>
                   <TableCell>{event.description}</TableCell>
-                  <TableCell>{event.course.title}</TableCell>
+                  <TableCell>{event.course?.title}</TableCell>
                   <TableCell>{event.startDate}</TableCell>
                   <TableCell>{event.endDate}</TableCell>
                   <TableCell>{event.maxStudents}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      onClick={() => handleViewStudents(event.id, event.title)}
+                    >
+                      View Students
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Student List Dialog */}
+        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+          <DialogTitle>Students Registered for "{selectedEventTitle}"</DialogTitle>
+          <DialogContent dividers>
+            {selectedStudents.length > 0 ? (
+              <List>
+                {selectedStudents.map((student, index) => (
+                  <ListItem key={index}>
+                    <ListItemText primary={student.username || student} />
+                  </ListItem>
+                ))}
+              </List>
+            ) : (
+              <Typography>No students registered for this event.</Typography>
+            )}
+          </DialogContent>
+        </Dialog>
       </Box>
     </>
   );

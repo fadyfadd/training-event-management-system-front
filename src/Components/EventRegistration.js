@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import axiosInstance from './axiosInstance';
 import StudentNav from './NavBar/StudentNav';
 import {
   Container,
   Paper,
-  TextField,
   Typography,
   FormControl,
   InputLabel,
@@ -15,9 +14,6 @@ import {
   Grid,
   Box,
 } from '@mui/material';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 function EventRegistration() {
   const [events, setEvents] = useState([]);
@@ -25,41 +21,26 @@ function EventRegistration() {
   const [message, setMessage] = useState('');
   const [messageSeverity, setMessageSeverity] = useState('info');
   const [registeredEvents, setRegisteredEvents] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const token = localStorage.getItem('token');
-  console.log('🔑 Token from localStorage:', token);
-  console.log('🔍 Token content:', JSON.stringify(jwtDecode(token), null, 2));
-  const config = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  };
-
-
-  const getStudentIdFromToken = () => {
+  const studentId = (() => {
     try {
-      const decoded = jwtDecode(token);
-      console.log('✅ Decoded token:', decoded);
-      return decoded?.id || null;
+      return jwtDecode(token)?.id || null;
     } catch (error) {
-      console.error('❌ Invalid token:', error);
+      console.error('Invalid token:', error);
       return null;
     }
-  };
-
-  const studentId = getStudentIdFromToken();
-  console.log('🎓 Student ID:', studentId);
+  })();
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        console.log('📡 Fetching all events...');
-        const res = await axios.get('http://localhost:8080/events/all', config);
-        console.log('📦 Fetched events:', res.data);
+        const res = await axiosInstance.get('/events/all');
+        const now = new Date();
+
         setEvents(res.data);
+
       } catch (err) {
-        console.error('❌ Failed to fetch events:', err.response?.data || err.message);
         setMessage('Failed to load events.');
         setMessageSeverity('error');
       }
@@ -67,13 +48,11 @@ function EventRegistration() {
 
     const fetchRegisteredEvents = async () => {
       try {
-        console.log('📡 Fetching registered events...');
-        const res = await axios.get(`http://localhost:8080/students/${studentId}`, config);
+        const res = await axiosInstance.get(`/students/${studentId}`);
         const registered = res.data.events.map((event) => event.id);
-        console.log('🎯 Registered event IDs:', registered);
         setRegisteredEvents(registered);
       } catch (err) {
-        console.error('❌ Could not fetch registered events:', err.response?.data || err.message);
+        console.error('Could not fetch registered events:', err);
       }
     };
 
@@ -90,6 +69,15 @@ function EventRegistration() {
       return;
     }
 
+    const selectedEvent = events.find((event) => event.id === parseInt(selectedEventId));
+
+if (new Date(selectedEvent?.startDate) <= new Date()) {
+  setMessage('You cannot register for an event that has already started.');
+  setMessageSeverity('error');
+  return;
+}
+
+
     if (registeredEvents.includes(parseInt(selectedEventId))) {
       setMessage('You have already registered for this event.');
       setMessageSeverity('warning');
@@ -97,17 +85,11 @@ function EventRegistration() {
     }
 
     try {
-      const res = await axios.post(
-        `http://localhost:8080/students/${studentId}/events/${selectedEventId}/register`,
-        {},
-        config
-      );
-      console.log('✅ Registration success:', res.data);
+      const res = await axiosInstance.post(`/students/${studentId}/events/${selectedEventId}/register`);
       setMessage(res.data);
       setMessageSeverity('success');
       setRegisteredEvents((prev) => [...prev, parseInt(selectedEventId)]);
     } catch (err) {
-      console.error('❌ Registration failed:', err.response?.data || err.message);
       setMessage('Registration failed: ' + (err.response?.data || err.message));
       setMessageSeverity('error');
     }
@@ -138,27 +120,25 @@ function EventRegistration() {
                   label="Select an event"
                 >
                   <MenuItem value="">
-                    <em>-- Select an event --</em>
+                    <em>-- Select an upcoming event --</em>
                   </MenuItem>
-                  {events.map((event) => (
-                    <MenuItem key={event.id} value={event.id}>
-                      {event.title} - {"Start date: "+ event.startDate + " - End Date: " + event.endDate} 
-                    </MenuItem>
-                  ))}
+                  {events.map((event) => {
+  const hasStarted = new Date(event.startDate) <= new Date();
+  return (
+    <MenuItem
+      key={event.id}
+      value={event.id}
+      disabled={hasStarted}
+    >
+      {event.title} - Start: {event.startDate}, End: {event.endDate}
+      {hasStarted && ' (Already Started)'}
+    </MenuItem>
+  );
+})}
+
                 </Select>
               </FormControl>
             </Grid>
-
-            {/* <Grid item>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  label="Filter by date (optional)"
-                  value={selectedDate}
-                  onChange={(newValue) => setSelectedDate(newValue)}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
-                />
-              </LocalizationProvider>
-            </Grid> */}
 
             <Grid item>
               <Box sx={{ display: 'flex', gap: 2 }}>

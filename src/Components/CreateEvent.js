@@ -17,6 +17,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import AdminNav from './NavBar/AdminNav';
+import axiosInstance from './axiosInstance';
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
@@ -40,12 +41,8 @@ const CreateEvent = () => {
         const token = localStorage.getItem('token');
         
         const [coursesRes, teachersRes] = await Promise.all([
-          axios.get('http://localhost:8080/courses/all', {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          axios.get('http://localhost:8080/teachers/all', {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+          axiosInstance.get('/courses/all'),
+          axiosInstance.get('/teachers/all')
         ]);
         
         setCourses(coursesRes.data);
@@ -91,12 +88,7 @@ const CreateEvent = () => {
         teacher: { id: formData.teacherId }
       };
 
-      const response = await axios.post('http://localhost:8080/events/save', eventData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await axiosInstance.post('http://localhost:8080/events/save', eventData);
 
       setSuccess('Event created successfully!');
       setFormData({

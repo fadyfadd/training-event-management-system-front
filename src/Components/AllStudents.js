@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import AdminNav from './NavBar/AdminNav';
 import TeacherNav from './NavBar/TeacherNav';
+import axiosInstance from './axiosInstance';
 
 const AllStudents = () => {
   const [students, setStudents] = useState([]);
@@ -20,14 +21,10 @@ const AllStudents = () => {
     try {
       const token = localStorage.getItem('token');
       const url = username
-        ? `http://localhost:8080/students/search?username=${username}&page=${page}&size=${size}`
-        : `http://localhost:8080/students/paginated?page=${page}&size=${size}`;
+        ? `/students/search?username=${username}&page=${page}&size=${size}`
+        : `/students/paginated?page=${page}&size=${size}`;
 
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await axiosInstance.get(url);
 
       setStudents(res.data.content);
       setTotalElements(res.data.totalElements);

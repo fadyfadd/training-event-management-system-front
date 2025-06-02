@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import AdminNav from './NavBar/AdminNav';
 import TeacherNav from './NavBar/TeacherNav';
+import axiosInstance from './axiosInstance';
 
 const RegisterStudentToEvent = () => {
   const [studentId, setStudentId] = useState('');
@@ -25,15 +26,8 @@ const RegisterStudentToEvent = () => {
     setError('');
 
     try {
-      const res = await axios.post(
-        `http://localhost:8080/students/${studentId}/events/${eventId}/register`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axiosInstance.post(
+        `/students/${studentId}/events/${eventId}/register`);
       setMessage(res.data);
     } catch (err) {
       console.error('Registration failed:', err);
