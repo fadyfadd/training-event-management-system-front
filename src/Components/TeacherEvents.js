@@ -7,6 +7,7 @@ import {
 } from '@mui/material';
 import TeacherNav from './NavBar/TeacherNav';
 import axiosInstance from './axiosInstance';
+import { useSelector } from 'react-redux';
 
 const getUsernameFromToken = (token) => {
   try {
@@ -19,12 +20,14 @@ const getUsernameFromToken = (token) => {
 };
 
 const TeacherEvents = () => {
+
   const [events, setEvents] = useState([]);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedEventTitle, setSelectedEventTitle] = useState('');
 
-  const token = localStorage.getItem('token');
+  const {token} = useSelector((state) => state.auth);
+  // const token = localStorage.getItem('token');
   const username = getUsernameFromToken(token);
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import {
 import AdminNav from './NavBar/AdminNav';
 import TeacherNav from './NavBar/TeacherNav';
 import axiosInstance from './axiosInstance';
+import { useSelector } from 'react-redux';
 
 const AllTeachers = () => {
   const [teachers, setTeachers] = useState([]);
@@ -15,11 +16,12 @@ const AllTeachers = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const role = localStorage.getItem('role');
+  // const role = localStorage.getItem('role');
+  const {token, role} = useSelector((state) => state.auth);
 
   const fetchTeachers = async (page, size, username = '') => {
     try {
-      const token = localStorage.getItem('token');
+      // const token = localStorage.getItem('token');
       const url = username
         ? `/teachers/search?username=${username}&page=${page}&size=${size}`
         : `/teachers/search?page=${page}&size=${size}`;
@@ -35,7 +37,7 @@ const AllTeachers = () => {
 
   useEffect(() => {
     fetchTeachers(page, rowsPerPage, searchTerm);
-  }, [page, rowsPerPage, searchTerm]);
+  }, [page, rowsPerPage, searchTerm, token]);
 
   const handleSearch = () => {
     setPage(0);

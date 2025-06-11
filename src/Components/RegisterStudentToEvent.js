@@ -11,14 +11,16 @@ import {
 import AdminNav from './NavBar/AdminNav';
 import TeacherNav from './NavBar/TeacherNav';
 import axiosInstance from './axiosInstance';
+import { useSelector } from 'react-redux';
 
 const RegisterStudentToEvent = () => {
   const [studentId, setStudentId] = useState('');
   const [eventId, setEventId] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const role = localStorage.getItem('role');
-  const token = localStorage.getItem('token');
+  // const role = localStorage.getItem('role');
+  // const token = localStorage.getItem('token');
+  const { token, role } = useSelector((state) => state.auth);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

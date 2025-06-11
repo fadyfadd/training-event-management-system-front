@@ -9,6 +9,7 @@ import {
 import StudentNav from './NavBar/StudentNav';
 import { jwtDecode } from 'jwt-decode';
 import axiosInstance from './axiosInstance';
+import { useSelector } from 'react-redux';
 
 const StudentEvents = () => {
   const [events, setEvents] = useState([]);
@@ -17,7 +18,8 @@ const StudentEvents = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [eventToUnregister, setEventToUnregister] = useState(null);
 
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const {token} = useSelector((state) => state.auth);
 
   const getUsernameFromToken = () => {
     try {
@@ -36,7 +38,7 @@ const StudentEvents = () => {
       try {
         const res = await axiosInstance.get(`/events/student/${username}`);
         setEvents(res.data);
-        console.log('📦 Student events:', res.data);
+        // console.log('📦 Student events:', res.data);
       } catch (error) {
         console.error('❌ Failed to fetch student events:', error);
       }
@@ -53,7 +55,7 @@ const StudentEvents = () => {
     try {
       await axiosInstance.delete(`/events/${eventToUnregister}/unregister/${username}`);
       setEvents(events.filter(event => event.id !== eventToUnregister));
-      console.log(`✅ Unregistered from event ID: ${eventToUnregister}`);
+      // console.log(`✅ Unregistered from event ID: ${eventToUnregister}`);
     } catch (error) {
       console.error(`❌ Failed to unregister from event ID: ${eventToUnregister}`, error);
     } finally {

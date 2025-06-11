@@ -13,6 +13,9 @@ import RegisterStudentToEvent from './Components/RegisterStudentToEvent';
 import CreateEvent from './Components/CreateEvent';
 import EventRegistration from './Components/EventRegistration';
 import StudentEvents from './Components/StudentEvents';
+import { store } from './Store/store';
+import { Provider } from 'react-redux';
+import AuthLoader from './Components/AuthLoader';
 
 const RootLayout = () => {
   return (
@@ -27,68 +30,34 @@ const router = createBrowserRouter([
     path: "/",
     element: <RootLayout />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "admin/home",
-        element: <AdminDashboard />,
-      },
-      {
-        path: "admin/getAllStudents",
-        element: <AllStudents />,
-      },
-      {
-        path: "admin/getAllTeachers",
-        element: <AllTeachers />
-      },
-      {
-        path: "admin/getAllEvents",
-        element: <AllEvents />
-      },
-      {
-        path: "/admin/registerStudentToEvent",
-        element: <RegisterStudentToEvent />
-      },
-      {
-        path: "/admin/createEvent",
-        element: <CreateEvent />
-      },
-      {
-        path: "teacher/home",
-        element: <TeacherDashboard />
-      },
-      {
-        path: "teacher/getAllStudents",
-        element: <AllStudents />,
-      },
-      {
-        path: "teacher/myEvents",
-        element: <TeacherEvents />,
-      },
-      {
-        path: "student/home",
-        element: <StudentDashboard />
-      },
-      {
-        path: "student/registerToEvent",
-        element: <EventRegistration />
-      },
-      {
-        path: "student/myEvents",
-        element: <StudentEvents />
-      }
-    ],
-  },
+      { index: true, element: <Home /> },
+      { path: "login", element: <LoginPage /> },
+      { path: "admin/home", element: <AdminDashboard /> },
+      { path: "admin/getAllStudents", element: <AllStudents /> },
+      { path: "admin/getAllTeachers", element: <AllTeachers /> },
+      { path: "admin/getAllEvents", element: <AllEvents /> },
+      { path: "admin/registerStudentToEvent", element: <RegisterStudentToEvent /> },
+      { path: "admin/createEvent", element: <CreateEvent /> },
+      { path: "teacher/home", element: <TeacherDashboard /> },
+      { path: "teacher/getAllStudents", element: <AllStudents /> },
+      { path: "teacher/myEvents", element: <TeacherEvents /> },
+      { path: "student/home", element: <StudentDashboard /> },
+      { path: "student/registerToEvent", element: <EventRegistration /> },
+      { path: "student/myEvents", element: <StudentEvents /> }
+    ]
+  }
 ]);
 
+
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+    <Provider store={store}>
+      <AuthLoader />
+      <RouterProvider router={router} />
+    </Provider>
+    </>
+  );
 }
 
 export default App;

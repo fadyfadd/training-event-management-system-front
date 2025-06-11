@@ -14,6 +14,7 @@ import {
   Grid,
   Box,
 } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 function EventRegistration() {
   const [events, setEvents] = useState([]);
@@ -22,7 +23,8 @@ function EventRegistration() {
   const [messageSeverity, setMessageSeverity] = useState('info');
   const [registeredEvents, setRegisteredEvents] = useState([]);
 
-  const token = localStorage.getItem('token');
+  // const token = localStorage.getItem('token');
+  const {token} = useSelector((state) => state.auth);
   const studentId = (() => {
     try {
       return jwtDecode(token)?.id || null;

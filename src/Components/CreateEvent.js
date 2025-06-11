@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import {
   Box,
   Typography,
@@ -18,6 +17,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import AdminNav from './NavBar/AdminNav';
 import axiosInstance from './axiosInstance';
+import { useSelector } from 'react-redux';
+
 
 const CreateEvent = () => {
   const [formData, setFormData] = useState({
@@ -30,6 +31,8 @@ const CreateEvent = () => {
     teacherId: ''
   });
 
+  const {token} = useSelector((state) => state.auth);
+
   const [courses, setCourses] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [error, setError] = useState('');
@@ -38,7 +41,6 @@ const CreateEvent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
         
         const [coursesRes, teachersRes] = await Promise.all([
           axiosInstance.get('/courses/all'),
@@ -76,7 +78,7 @@ const CreateEvent = () => {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
+      // const token = localStorage.getItem('token');
       
       const eventData = {
         title: formData.title,
