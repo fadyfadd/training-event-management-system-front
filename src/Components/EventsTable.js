@@ -2,12 +2,15 @@
 import React from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Paper, Button, TablePagination
+  TableRow, Paper, Button, TablePagination,
+  IconButton
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 
 const EventsTable = ({
   events, totalElements, page, rowsPerPage,
-  onPageChange, onRowsPerPageChange, handleViewStudents, showPagination
+  onPageChange, onRowsPerPageChange, handleViewStudents, showPagination, onDeleteClick
 }) => {
   return (
     <TableContainer component={Paper}>
@@ -40,11 +43,18 @@ const EventsTable = ({
                 <TableCell>
                   <Button
                     size="small"
-                    variant="contained"
-                    onClick={() => handleViewStudents(event.id || event.eventId)}
+                    variant="outlined"
+                    onClick={() => handleViewStudents(event.id)}
                   >
                     View Students
                   </Button>
+                  <IconButton
+                    color='error'
+                    onClick={() => onDeleteClick(event.id)}
+                  >
+                  <DeleteIcon />
+                  </IconButton>
+
                 </TableCell>
               </TableRow>
             ))
