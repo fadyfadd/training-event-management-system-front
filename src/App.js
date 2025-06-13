@@ -16,6 +16,7 @@ import StudentEvents from './Components/StudentEvents';
 import { store } from './Store/store';
 import { Provider } from 'react-redux';
 import AuthLoader from './Components/AuthLoader';
+import CourseManager from './Components/CourseManager';
 
 const RootLayout = () => {
   return (
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
       { path: "admin/getAllEvents", element: <AllEvents /> },
       { path: "admin/registerStudentToEvent", element: <RegisterStudentToEvent /> },
       { path: "admin/createEvent", element: <CreateEvent /> },
+      { path: "admin/manageCourses", element: <CourseManager /> },
       { path: "teacher/home", element: <TeacherDashboard /> },
       { path: "teacher/getAllStudents", element: <AllStudents /> },
       { path: "teacher/myEvents", element: <TeacherEvents /> },

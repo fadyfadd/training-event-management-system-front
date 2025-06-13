@@ -46,6 +46,10 @@ export const AdminNav = () => {
             <Button color='inherit'>All Events</Button>
           </NavLink>
 
+          <NavLink to= "/admin/manageCourses" style={linkStyle} >
+            <Button color='inherit'>Manage Courses</Button>
+          </NavLink>
+
           <NavLink to= "/admin/registerStudentToEvent" style={linkStyle} >
             <Button color='inherit'>Register Student to Event</Button>
           </NavLink>
